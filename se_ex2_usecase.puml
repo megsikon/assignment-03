@@ -1,11 +1,40 @@
 @startuml
 
-class Project
+class Project {
+    name : String
+    startDate : DateTime
+    endDate : DateTime
+}
 
-class ProjectManager
+
+class ProjectManager{
+    name : String
+    telephone : int
+    team : Team
+    StartTime()
+    EndTime()
+}
+
+Class Team{
+    project : Project
+}
+Class System{
+    completion : int
+    description : String
+}
+Class Requirement{
+    completion : int
+    description: String
+}
+Class Dev
 
 
+Project "1." -- "1."ProjectManager
+Dev -left-* Team
+Team -->Project
+ProjectManager-->Team
+Project <-- Requirement
+System --* Project
 
-Project --> ProjectManager
 
 @enduml
