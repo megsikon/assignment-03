@@ -2,6 +2,12 @@ namespace Assignment3.Entities;
 
 public class TaskRepository : ITaskRepository
 {
+    private readonly KanbanContext _context;
+    public TaskRepository(KanbanContext context)
+    {
+        _context = context;
+    }
+
     public (Response Response, int TaskId) Create(TaskCreateDTO task)
     {
         throw new NotImplementedException();

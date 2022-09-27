@@ -2,6 +2,12 @@ namespace Assignment3.Entities;
 
 public class UserRepository
 {
+    private readonly KanbanContext _context;
+    public UserRepository(KanbanContext context)
+    {
+        _context = context;
+    }
+
     public (Response Response, int UserId) Create(UserCreateDTO user)
     {
         throw new NotImplementedException();
