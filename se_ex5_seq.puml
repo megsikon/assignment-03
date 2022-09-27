@@ -1,0 +1,19 @@
+@startuml
+participant Button as Btn
+participant ButtonDialer as BtnDial
+participant SendButton as sendBtn
+participant Dialer as Dial
+participant Screen
+participant Speaker as Spk
+participant Radio 
+
+Btn -> BtnDial : Button Pressed
+Btn -> sendBtn : Button Pressed
+BtnDial -> Dial : Send
+sendBtn -> Dial : Digit(n)
+Dial -> Screen : Display(digit(n))
+Dial -> Spk : Ton(n)
+Dial -> Radio : connect(pno)
+Radio -> Screen : inUse()
+
+@enduml
