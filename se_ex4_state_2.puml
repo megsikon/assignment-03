@@ -1,0 +1,9 @@
+@startuml
+[*] --> Untracked : create
+Untracked --> Staged : add
+Staged --> Unmodified : commit
+Unmodified --> Modified : edit
+Modified --> Staged : add
+
+
+@enduml
