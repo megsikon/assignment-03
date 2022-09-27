@@ -1,0 +1,45 @@
+@startuml
+class MedicalReceptionist {
+    {method} login()
+    updateInfo()
+    updateSummary()
+    logout()
+}
+
+class PatientInfo{
+    {method}updatePRS(UID)
+    summarize(UID)
+    
+}
+
+class summary{
+    {method}update(PID)
+    message(Resp)
+}
+
+class MentcareDB{
+    {method} auth(TF, UID)
+    update(PID)
+    message(Resp)
+}
+
+class Authorization{
+    authorization()
+
+}
+
+class PRS{
+    {method}login(Resp)
+    update(Resp)    
+}
+
+MedicalReceptionist -- PRS
+PRS -- summary
+PRS -- MentcareDB
+MentcareDB -- Authorization
+MentcareDB -- PatientInfo
+PatientInfo -- summary
+summary -- MentcareDB
+PatientInfo -- MedicalReceptionist
+
+@enduml
