@@ -9,6 +9,5 @@ public class Task
     public string Title{get;set;}
     public User AssignedTo{get;set;}
     public string Description {get;set;}
-    
 
 }
