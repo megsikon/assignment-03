@@ -1,0 +1,14 @@
+@startuml
+state endS <<end>>
+state endF <<end>>
+
+state Actions { 
+    Setup --> Restore : Succeed
+    Build <-- Restore : Succeed
+    Restore --> Build : Succeed
+Build --> Test : Succeed
+}
+[*] --> Setup : Push
+Test --> endS : Succeed
+Actions --> endF : Fail
+@enduml

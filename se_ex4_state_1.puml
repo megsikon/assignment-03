@@ -1,0 +1,7 @@
+@startuml
+[*] --> Unmodified : clone
+Unmodified --> Modified : edit
+Modified --> Staged : add
+Staged --> Unmodified : commit
+
+@enduml
