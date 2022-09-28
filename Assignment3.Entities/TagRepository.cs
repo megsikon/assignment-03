@@ -8,30 +8,39 @@ public class TagRepository : ITagRepository
         _context = context;
     }
 
-    public (Response response, int TagId) Create(TagCreateDTO tag)
+    public (Response Response, int TagId) Create(TagCreateDTO tag)
     {
         var entity = _context.Tags.FirstOrDefault(t => t.Name == tag.Name);
         Response res;
         if(entity is null){
-            entity = new Tag();
+            entity = new Tag(){Name = tag.Name};
             _context.Tags.Add(entity);
             _context.SaveChanges();
+
             res = Response.Created;
         }else{
             res = Response.Conflict;
         }
+
         var created = new TagDTO(entity.Id,entity.Name);
         return (res,created.Id);
     }
     
     public IReadOnlyCollection<TagDTO> ReadAll()
     {
-        throw new NotImplementedException();
+        var tags = from t in _context.Tags
+                    orderby t.Name
+                    select new TagDTO(t.Id,t.Name);
+
+        return tags.ToArray();
     }
     
     public TagDTO Read(int tagId)
     {
-        throw new NotImplementedException();
+        var tag = from t in _context.Tags
+                where t.Id == tagId
+                select new TagDTO(t.Id,t.Name);
+        return tag.FirstOrDefault()!;
     }
     
     public Response Update(TagUpdateDTO tag)
@@ -41,6 +50,9 @@ public class TagRepository : ITagRepository
 
         if(entity is null){
             response = Response.NotFound;
+        }else if (_context.Tags.FirstOrDefault(t => t.Id != tag.Id && t.Name == tag.Name) != null)
+        {
+            response = Response.Conflict;
         }else{
             entity.Name = tag.Name;
             _context.SaveChanges();
@@ -51,16 +63,21 @@ public class TagRepository : ITagRepository
 
     public Response Delete(int tagId, bool force = false)
     {
-        var tag = _context.Tags.Include(t=>t.Id);//mangler noget her 
+        var tag = _context.Tags.Include(t=>t.Tasks).FirstOrDefault(t=> t.Id==tagId); 
         Response response;
         if(tag is null){
             response = Response.NotFound;
-        } else if(tag.Any()){
+        } else if(tag.Tasks.Any()){
             response = Response.Conflict;
         }else{
-            _context.Tags.Remove().tag;
-            _context.SaveChanges();
-            response = Response.Updated;
+            if(force){
+                _context.Tags.Remove(tag);
+                _context.SaveChanges();
+                response = Response.Updated;
+            }else{
+                response = Response.Conflict;
+            }
         }
+        return response;
     }
 }
