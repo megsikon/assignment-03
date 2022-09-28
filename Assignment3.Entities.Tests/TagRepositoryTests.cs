@@ -25,27 +25,43 @@ public TagRepositoryTests() {
     public void Delete_given_non_existing_TagId_returns_NotFound() => _repo.Delete(42).Should().Be(NotFound);
 
 
+    //create
+    [Fact]
+    public void Create_Tag_returns_Created_with_tag(){
+        var(response,created) = _repo.Create(new TagCreateDTO("Created Tak"));
+        response.Should().Be(Created);
+        created.Should().Be(new TagDTO(32,"Created Tag"));
+
+
+    }
+    [Fact]
+    public void Create_tag_given_exisiting_tag_returns_Conflict(){
+        var(response,tag) = _repo.Create(new TagCreateDTO("TagNameHere"));
+        response.Should().Be(Conflict);
+        tag.Should().Be(new TagDTO(1,"TagNameHere"));    
+
+    }
+
+    //read
+    
+
+
+    //update
+    [Fact]
+    public void Update_Tag_returns_Updated_with_tag(){
+        var response = _repo.Update(new TagDTO(3,"Updated Tag"));
+        response.Should().Be(Updated);
+        var entity = _context.Tags.Find(3)!;
+        entity.Name.Should().Be("Updated Tag");
+    }
 
     [Fact]
-    public void First_Test_Name_Here(){
-        // var(response,created) = _repo.Create(new TagCreateDTO(""));
-        // response.Should().Be(Created);
-        // created.Should().Be();
-
-
+    public void Update_tag_given_exisiting_tag_returns_Conflict(){
+        var response = _repo.Update(new TagDTO(1,"ConflictUpdateTag"));
+        response.Should().Be(Conflict);
+        var entity = _context.Tags.Find(1)!;
+        entity.Name.Should().Be("TagNameHere");
     }
-       [Fact]
-    public void Second_Test_Name_Here(){
-       
-
-
-    }
-       [Fact]
-    public void Third_Test_Name_Here(){
-        
-
-    }
-
 
     public void Dispose()
     {

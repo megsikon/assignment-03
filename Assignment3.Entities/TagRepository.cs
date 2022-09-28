@@ -8,9 +8,20 @@ public class TagRepository : ITagRepository
         _context = context;
     }
 
-    public (Response Response, int TagId) Create(TagCreateDTO tag)
+    public (Response response, int TagId) Create(TagCreateDTO tag)
     {
-        throw new NotImplementedException();
+        var entity = _context.Tags.FirstOrDefault(t => t.Name == tag.Name);
+        Response res;
+        if(entity is null){
+            entity = new Tag();
+            _context.Tags.Add(entity);
+            _context.SaveChanges();
+            res = Response.Created;
+        }else{
+            res = Response.Conflict;
+        }
+        var created = new TagDTO(entity.Id,entity.Name);
+        return (res,created.Id);
     }
     
     public IReadOnlyCollection<TagDTO> ReadAll()
@@ -25,11 +36,31 @@ public class TagRepository : ITagRepository
     
     public Response Update(TagUpdateDTO tag)
     {
-        throw new NotImplementedException();
+        var entity = _context.Tags.Find(tag.Id);
+        Response response;
+
+        if(entity is null){
+            response = Response.NotFound;
+        }else{
+            entity.Name = tag.Name;
+            _context.SaveChanges();
+            response = Response.Updated;
+        }
+        return response;
     }
 
     public Response Delete(int tagId, bool force = false)
     {
-        throw new NotImplementedException();
+        var tag = _context.Tags.Include(t=>t.Id);//mangler noget her 
+        Response response;
+        if(tag is null){
+            response = Response.NotFound;
+        } else if(tag.Any()){
+            response = Response.Conflict;
+        }else{
+            _context.Tags.Remove().tag;
+            _context.SaveChanges();
+            response = Response.Updated;
+        }
     }
 }
