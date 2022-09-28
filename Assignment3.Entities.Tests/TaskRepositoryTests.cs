@@ -19,7 +19,52 @@ public class TaskRepositoryTests : IDisposable
     }
 
 
-    //CREATE
+#region read
+
+    [Fact]
+    public void Read_should_return_given_task_details() {
+        _context.Tasks.Add(new Task{Id = 1, Title = "Task1", AssignedTo = new User{Id = 1, Name = "Alice", Email = "al@ice.org"}, Description = "hej", Tags = new List<Tag> {}});        
+
+        _repo.Read(1).Should().BeEquivalentTo(new TaskDTO(1, "Task1", "Alice", new List<string>(), State.New)); 
+    }  
+
+    [Fact]
+    public void ReadAll_should_return_all_tasks() { 
+        _context.Tasks.AddRange(new Task{Id = 1, Title = "Task1", AssignedTo = new User{Id = 1, Name = "Alice", Email = "al@ice.org"}, Description = "hej", Tags = new List<Tag> {}}, new Task{Id = 2, Title = "Task2", AssignedTo = new User{Id = 2, Name = "Bent", Email = "be@nt.org"}, Description = "med dig", Tags = new List<Tag> {}});
+    
+        _repo.ReadAll().Should().BeEquivalentTo(new[] {new TaskDTO(1, "Task1", "Alice", new List<string>{}, State.New), new TaskDTO(2, "Task2", "Bent", new List<string>{}, State.New)});
+    }
+
+    [Fact]
+    public void ReadAllRemoved_should_return_all_removed_tasks() {
+        _context.Tasks.AddRange(new Task{Id = 1, Title = "Task1", AssignedTo = new User{Id = 1, Name = "Alice", Email = "al@ice.org"}, Description = "hej", Tags = new List<Tag> {}, State = State.Removed}, new Task{Id = 2, Title = "Task2", AssignedTo = new User{Id = 2, Name = "Bent", Email = "be@nt.org"}, Description = "med dig", Tags = new List<Tag> {}});
+
+        _repo.ReadAllRemoved().Should().BeEquivalentTo(new[] {new TaskDTO(1, "Task1", "Alice", new List<string>{}, State.Removed)});
+    }
+
+    [Fact]
+    public void ReadAllByTag_should_return_all_tasks_with_given_tag() {
+        _context.Tasks.AddRange(new Task{Id = 1, Title = "Task1", AssignedTo = new User{Id = 1, Name = "Alice", Email = "al@ice.org"}, Description = "hej", Tags = new List<Tag> {new Tag{Id = 1, Name = "Important"}}, State = State.Removed}, new Task{Id = 2, Title = "Task2", AssignedTo = new User{Id = 2, Name = "Bent", Email = "be@nt.org"}, Description = "med dig", Tags = new List<Tag> {new Tag{Id = 2, Name = "Not Important"}}});
+
+        _repo.ReadAllByTag("Important").Should().BeEquivalentTo(new[] {new TaskDTO(1, "Task1", "Alice", new List<string>{"Important"}, State.New)});
+    }
+
+    [Fact]
+    public void ReadAllByUser_should_returm_all_tasks_with_given_user() {
+        _context.Tasks.AddRange(new Task{Id = 1, Title = "Task1", AssignedTo = new User{Id = 1, Name = "Alice", Email = "al@ice.org"}, Description = "hej", Tags = new List<Tag> {}}, new Task{Id = 2, Title = "Task2", AssignedTo = new User{Id = 2, Name = "Bent", Email = "be@nt.org"}, Description = "med dig", Tags = new List<Tag> {}});
+
+        _repo.ReadAllByUser(1).Should().BeEquivalentTo(new[] {new TaskDTO(1, "Task1", "Alice", new List<string>{"Important"}, State.New)});
+    }
+
+    [Fact]
+    public void ReadAllByState_should_returm_all_tasks_with_given_state() {
+       _context.Tasks.AddRange(new Task{Id = 1, Title = "Task1", AssignedTo = new User{Id = 1, Name = "Alice", Email = "al@ice.org"}, Description = "hej", Tags = new List<Tag> {}, State = State.Resolved}, new Task{Id = 2, Title = "Task2", AssignedTo = new User{Id = 2, Name = "Bent", Email = "be@nt.org"}, Description = "med dig", Tags = new List<Tag> {}});
+
+        _repo.ReadAllByState(State.Resolved).Should().BeEquivalentTo(new[] {new TaskDTO(1, "Task1", "Alice", new List<string>{}, State.Resolved)});
+    }
+#endregion
+    
+#region create
 
     [Fact]
     public void Return_Created_Response_When_Creating_A_CreateTaskDTO() {
@@ -79,9 +124,9 @@ public class TaskRepositoryTests : IDisposable
         var entity = _context.Tasks.Find(1)!;
         entity.Created.Should().BeCloseTo(expTime, precision: TimeSpan.FromSeconds(5));
     }
+#endregion
 
-
-    /// DELETE
+#region delete
 
     [Fact]
     public void Delete_given_non_existing_TaskId_returns_NotFound() => _repo.Delete(42).Should().Be(NotFound);
@@ -131,6 +176,7 @@ public class TaskRepositoryTests : IDisposable
         response.Should().Be(Conflict);
         _context.Tasks.Find(42).Should().NotBeNull();
     }
+#endregion
 
 #region Update
     [Fact]

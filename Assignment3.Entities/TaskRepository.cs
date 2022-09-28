@@ -127,19 +127,19 @@ public class TaskRepository : ITaskRepository
         }
         return response;
     }
-    
-    //public Response Delete(int taskId){throw new NotImplementedException();}
-    
+        
     public Response Delete(int taskId)
     {
         var entity = _context.Tasks.Find(taskId);
         Response response;
 
-        if(entity.State == State.New ){
+        if(entity is null){
+            response = Response.NotFound;
+        }else if(entity.State == State.New ){
             _context.Tasks.Remove(entity);
             _context.SaveChanges();
             response = Response.Deleted;
-        } else if(entity.State == State.Active){
+        }else if(entity.State == State.Active){
             entity.State = State.Removed;
             _context.SaveChanges();
             response = Response.Updated; 
