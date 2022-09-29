@@ -41,6 +41,18 @@ public class TagRepositoryTests : IDisposable
         tag.Should().Be(new TagDTO(1,"TagNameHere").Id);    
     }
 
+    [Fact]
+    public void Delete_tag_without_force() {
+        var response = _repo.Delete(1);
+        response.Should().Be(Response.Conflict);
+    }
+
+    [Fact]
+    public void Delete_tag_with_force() {
+        var response = _repo.Delete(1, true);
+        response.Should().Be(Response.Updated);
+    }
+
     //read
     [Fact]
     public void ReadAll_returns_all_tag() => _repo.ReadAll().Should().BeEquivalentTo(new[] {new TagDTO(1,"TagNameHere"), new TagDTO(2,"SecondTagNameHere")});
