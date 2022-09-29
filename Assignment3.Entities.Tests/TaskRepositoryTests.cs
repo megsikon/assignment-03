@@ -24,42 +24,46 @@ public class TaskRepositoryTests : IDisposable
     [Fact]
     public void Read_should_return_given_task_details() {
         _context.Tasks.Add(new Task{Id = 1, Title = "Task1", AssignedTo = new User{Id = 1, Name = "Alice", Email = "al@ice.org"}, Description = "hej", Tags = new List<Tag> {}});        
-
+        _context.SaveChanges();
         _repo.Read(1).Should().BeEquivalentTo(new TaskDTO(1, "Task1", "Alice", new List<string>(), State.New)); 
     }  
 
     [Fact]
     public void ReadAll_should_return_all_tasks() { 
         _context.Tasks.AddRange(new Task{Id = 1, Title = "Task1", AssignedTo = new User{Id = 1, Name = "Alice", Email = "al@ice.org"}, Description = "hej", Tags = new List<Tag> {}}, new Task{Id = 2, Title = "Task2", AssignedTo = new User{Id = 2, Name = "Bent", Email = "be@nt.org"}, Description = "med dig", Tags = new List<Tag> {}});
-    
+        _context.SaveChanges();
         _repo.ReadAll().Should().BeEquivalentTo(new[] {new TaskDTO(1, "Task1", "Alice", new List<string>{}, State.New), new TaskDTO(2, "Task2", "Bent", new List<string>{}, State.New)});
     }
 
     [Fact]
     public void ReadAllRemoved_should_return_all_removed_tasks() {
-        _context.Tasks.AddRange(new Task{Id = 1, Title = "Task1", AssignedTo = new User{Id = 1, Name = "Alice", Email = "al@ice.org"}, Description = "hej", Tags = new List<Tag> {}, State = State.Removed}, new Task{Id = 2, Title = "Task2", AssignedTo = new User{Id = 2, Name = "Bent", Email = "be@nt.org"}, Description = "med dig", Tags = new List<Tag> {}});
-
+        _context.Tasks.Add(new Task{Id = 1, Title = "Task1", AssignedTo = new User{Id = 1, Name = "Alice", Email = "al@ice.org"}, Description = "hej", Tags = new List<Tag> {}, State = State.Removed});
+        _context.SaveChanges();
         _repo.ReadAllRemoved().Should().BeEquivalentTo(new[] {new TaskDTO(1, "Task1", "Alice", new List<string>{}, State.Removed)});
     }
 
     [Fact]
     public void ReadAllByTag_should_return_all_tasks_with_given_tag() {
-        _context.Tasks.AddRange(new Task{Id = 1, Title = "Task1", AssignedTo = new User{Id = 1, Name = "Alice", Email = "al@ice.org"}, Description = "hej", Tags = new List<Tag> {new Tag{Id = 1, Name = "Important"}}, State = State.Removed}, new Task{Id = 2, Title = "Task2", AssignedTo = new User{Id = 2, Name = "Bent", Email = "be@nt.org"}, Description = "med dig", Tags = new List<Tag> {new Tag{Id = 2, Name = "Not Important"}}});
-
+         _context.Tasks.AddRange(new Task{Id = 1, Title = "Task1", AssignedTo = new User{Id = 1, Name = "Alice", Email = "al@ice.org"}, Description = "hej", Tags = new List<Tag> {new Tag{Id = 1, Name = "Important"}}, State = State.Removed}, new Task{Id = 2, Title = "Task2", AssignedTo = new User{Id = 2, Name = "Bent", Email = "be@nt.org"}, Description = "med dig", Tags = new List<Tag> {new Tag{Id = 2, Name = "Not Important"}}});
+        _context.SaveChanges();
         _repo.ReadAllByTag("Important").Should().BeEquivalentTo(new[] {new TaskDTO(1, "Task1", "Alice", new List<string>{"Important"}, State.New)});
     }
 
     [Fact]
-    public void ReadAllByUser_should_returm_all_tasks_with_given_user() {
-        _context.Tasks.AddRange(new Task{Id = 1, Title = "Task1", AssignedTo = new User{Id = 1, Name = "Alice", Email = "al@ice.org"}, Description = "hej", Tags = new List<Tag> {}}, new Task{Id = 2, Title = "Task2", AssignedTo = new User{Id = 2, Name = "Bent", Email = "be@nt.org"}, Description = "med dig", Tags = new List<Tag> {}});
-
-        _repo.ReadAllByUser(1).Should().BeEquivalentTo(new[] {new TaskDTO(1, "Task1", "Alice", new List<string>{"Important"}, State.New)});
+    public void TESTING____ReadAllByUser_should_return_all_tasks_with_given_user() {
+         _context.Tasks.AddRange(new Task{Id = 3, Title = "Task1", AssignedTo = new User{Id = 3, Name = "Herman", Email = "her@man.org"}, Description = "hej", Tags = new List<Tag> {}}, new Task{Id = 2, Title = "Task2", AssignedTo = new User{Id = 2, Name = "Bent", Email = "be@nt.org"}, Description = "med dig", Tags = new List<Tag> {}});
+        //  _context.Tasks.AddRange(new Task{Id = 1, Title = "Task1", AssignedTo = new User{Id = 1, Name = "Alice", Email = "al@ice.org"}, Description = "hej", Tags = new List<Tag> {}}, new Task{Id = 1, Title = "Task2", AssignedTo = new User{Id = 1, Name = "Bent", Email = "be@nt.org"}, Description = "med dig", Tags = new List<Tag> {}});
+        // _context.SaveChanges();
+        // _context.Tasks.Add(new Task{Id = 3, Title = "Task1", AssignedTo = new User{Id = 3, Name = "Alice", Email = "al@ice.org"}, Description = "hej", Tags = new List<Tag> {}});        
+        // _context.SaveChanges();
+        // _repo.ReadAllByUser(1).Should().BeEquivalentTo(new[] {new TaskDTO(1, "Task1", "Alice", new List<string>{"Important"}, State.New),new TaskDTO(2, "Task2", "Bent", new List<string>{"Important"}, State.New)});
+        _repo.ReadAllByUser(2).Should().BeEquivalentTo(new[]{new TaskDTO(2, "Task1", "Herman", new List<string>{"Important"}, State.New)});
     }
 
     [Fact]
     public void ReadAllByState_should_returm_all_tasks_with_given_state() {
        _context.Tasks.AddRange(new Task{Id = 1, Title = "Task1", AssignedTo = new User{Id = 1, Name = "Alice", Email = "al@ice.org"}, Description = "hej", Tags = new List<Tag> {}, State = State.Resolved}, new Task{Id = 2, Title = "Task2", AssignedTo = new User{Id = 2, Name = "Bent", Email = "be@nt.org"}, Description = "med dig", Tags = new List<Tag> {}});
-
+        _context.SaveChanges();
         _repo.ReadAllByState(State.Resolved).Should().BeEquivalentTo(new[] {new TaskDTO(1, "Task1", "Alice", new List<string>{}, State.Resolved)});
     }
 #endregion
@@ -71,7 +75,6 @@ public class TaskRepositoryTests : IDisposable
         //arrange
         var exp = Response.Created;
         _context.Users.Add(new User{Id = 1, Name = "Alice", Email = "al@ice.org"});
-        
         //act
         var res = _repo.Create(new TaskCreateDTO(
             "title",
