@@ -50,14 +50,11 @@ public class TaskRepositoryTests : IDisposable
     }
 
     [Fact]
-    public void TESTING____ReadAllByUser_should_return_all_tasks_with_given_user() {
-         _context.Tasks.AddRange(new Task{Id = 3, Title = "Task1", AssignedTo = new User{Id = 3, Name = "Herman", Email = "her@man.org"}, Description = "hej", Tags = new List<Tag> {}}, new Task{Id = 2, Title = "Task2", AssignedTo = new User{Id = 2, Name = "Bent", Email = "be@nt.org"}, Description = "med dig", Tags = new List<Tag> {}});
-        //  _context.Tasks.AddRange(new Task{Id = 1, Title = "Task1", AssignedTo = new User{Id = 1, Name = "Alice", Email = "al@ice.org"}, Description = "hej", Tags = new List<Tag> {}}, new Task{Id = 1, Title = "Task2", AssignedTo = new User{Id = 1, Name = "Bent", Email = "be@nt.org"}, Description = "med dig", Tags = new List<Tag> {}});
-        // _context.SaveChanges();
-        // _context.Tasks.Add(new Task{Id = 3, Title = "Task1", AssignedTo = new User{Id = 3, Name = "Alice", Email = "al@ice.org"}, Description = "hej", Tags = new List<Tag> {}});        
-        // _context.SaveChanges();
-        // _repo.ReadAllByUser(1).Should().BeEquivalentTo(new[] {new TaskDTO(1, "Task1", "Alice", new List<string>{"Important"}, State.New),new TaskDTO(2, "Task2", "Bent", new List<string>{"Important"}, State.New)});
-        _repo.ReadAllByUser(2).Should().BeEquivalentTo(new[]{new TaskDTO(2, "Task1", "Herman", new List<string>{"Important"}, State.New)});
+    public void ReadAllByUser_should_return_all_tasks_with_given_user() {
+        _context.Tasks.AddRange(new Task{Id = 1, Title = "Task1", AssignedTo = new User{Id = 1, Name = "Herman", Email = "her@man.org"}, Description = "hej", Tags = new List<Tag> {}}, new Task{Id = 2, Title = "Task2", AssignedTo = new User{Id = 2, Name = "Bent", Email = "be@nt.org"}, Description = "med dig", Tags = new List<Tag> {}});
+        _context.SaveChanges();
+        var expected= new TaskDTO(1, "Task1", "Herman", new List<string>{}, State.New);
+        _repo.ReadAllByUser(1).Should().BeEquivalentTo(new[] {expected});
     }
 
     [Fact]

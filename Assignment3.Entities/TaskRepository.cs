@@ -75,7 +75,15 @@ public class TaskRepository : ITaskRepository
     
     public IReadOnlyCollection<TaskDTO> ReadAllByUser(int userId)
     {
-        throw new NotImplementedException();
+        var task = from t in _context.Tasks
+                  where t.Id == userId
+                  select new TaskDTO(
+                      t.Id,
+                      t.Title,
+                      t.AssignedTo.Name,
+                      t.Tags.Select(t => t.Name).ToList(),
+                      t.State);
+        return task.ToList();
     }
     
     public IReadOnlyCollection<TaskDTO> ReadAllByState(State state)
